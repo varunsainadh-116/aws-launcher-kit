@@ -121,4 +121,52 @@ create_ec2_instance() {
 # Main Function
 # -----------------------------
 
+main() {
+    check_awscli || install_awscli
 
+    log_info "🛠️  Let's configure your EC2 instance..."
+
+    # AMI ID prompt
+    echo -e "${BLUE}📦 Choose your AMI:${RESET}"
+    echo -e "   🟢 1) Amazon Linux 2  - ami-0c02fb55956c7d316"
+    echo -e "   🟣 2) Ubuntu 22.04    - ami-007020fd9c84e18c7"
+    read -p "Enter AMI ID (Press Enter for default Amazon Linux 2): " AMI_ID
+    AMI_ID=${AMI_ID:-ami-0c02fb55956c7d316}
+
+    echo
+
+    # Instance type
+    read -p "Enter Instance Type (default: t2.micro): " INSTANCE_TYPE
+    INSTANCE_TYPE=${INSTANCE_TYPE:-t2.micro}
+
+    echo
+
+    # Key Pair Name
+    read -p "Enter Key Pair Name: " KEY_NAME
+
+    echo
+
+    # Subnet ID
+    read -p "Enter Subnet ID: " SUBNET_ID
+
+    echo
+
+    # Security Group IDs
+    read -p "Enter Security Group IDs (space-separated): " SECURITY_GROUP_IDS
+
+    echo
+
+    # Instance Name
+    read -p "Enter Instance Name (default: MyShellInstance): " INSTANCE_NAME
+    INSTANCE_NAME=${INSTANCE_NAME:-MyShellInstance}
+
+    echo
+    log_info "🚀 Launching your EC2 instance..."
+
+    create_ec2_instance "$AMI_ID" "$INSTANCE_TYPE" "$KEY_NAME" "$SUBNET_ID" "$SECURITY_GROUP_IDS" "$INSTANCE_NAME"
+
+    log_success "✅ EC2 instance creation completed!"
+}
+
+
+main
