@@ -1,5 +1,7 @@
 # aws-launcher-kit
----
+A lightweight CLI-based toolkit to automate the deployment of EC2 instances using AWS CLI. This script simplifies instance instantiation, making cloud provisioning fast, repeatable, and hassle-free.
+## Workflow
+![img.git](Ec2_intilization.gif)
 
 ## ⚙️ Environment Setup
 
