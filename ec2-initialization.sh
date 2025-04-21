@@ -46,7 +46,16 @@ install_awscli() {
 
     # Download and install AWS CLI v2
     curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" || error_exit "Failed to download AWS CLI installer."
-    sudo apt-get install -y unzip &> /dev/null || error_exit "Failed to install unzip."
+
+    # Install unzip (detect distro)
+    if command -v pacman &> /dev/null; then
+        sudo pacman -S --noconfirm unzip || error_exit "Failed to install unzip (pacman)."
+    elif command -v apt-get &> /dev/null; then
+        sudo apt-get install -y unzip || error_exit "Failed to install unzip (apt-get)."
+    else
+        error_exit "Unsupported package manager. Install 'unzip' manually."
+    fi
+
     unzip -q awscliv2.zip || error_exit "Failed to unzip AWS CLI installer."
     sudo ./aws/install || error_exit "Failed to install AWS CLI."
 
@@ -58,6 +67,7 @@ install_awscli() {
     log_warn "Cleaning up the Files"
     log_success "AWS CLI installation successful."
 }
+
 
 # -----------------------------
 # Wait for Instance to be Running
@@ -122,16 +132,16 @@ create_ec2_instance() {
 # -----------------------------
 
 main() {
-    check_awscli || install_awscli
+    check_awscli 
 
     log_info "🛠️  Let's configure your EC2 instance..."
 
     # AMI ID prompt
     echo -e "${BLUE}📦 Choose your AMI:${RESET}"
-    echo -e "   🟢 1) Amazon Linux 2  - ami-0c02fb55956c7d316"
-    echo -e "   🟣 2) Ubuntu 22.04    - ami-007020fd9c84e18c7"
+    echo -e "   🟢 1) Amazon Linux 2  - ami-0f1dcc636b69a6438"
+    echo -e "   🟣 2) Ubuntu 22.04    - ami-0e35ddab05955cf57"
     read -p "Enter AMI ID (Press Enter for default Amazon Linux 2): " AMI_ID
-    AMI_ID=${AMI_ID:-ami-0c02fb55956c7d316}
+    AMI_ID=${AMI_ID:-ami-0f1dcc636b69a64}
 
     echo
 
@@ -142,17 +152,20 @@ main() {
     echo
 
     # Key Pair Name
-    read -p "Enter Key Pair Name: " KEY_NAME
+    read -p "Enter Key Pair Name (default: shell_admin): " KEY_NAME
+    KEY_NAME=${KEY_NAME:-shell_admin}
 
     echo
 
     # Subnet ID
-    read -p "Enter Subnet ID: " SUBNET_ID
+    read -p "Enter Subnet ID (default: subnet-036adab8c6c59bde8): " SUBNET_ID
+    SUBNET_ID=${SUBNET_ID:-subnet-036adab8c6c59bde8}
 
     echo
 
     # Security Group IDs
-    read -p "Enter Security Group IDs (space-separated): " SECURITY_GROUP_IDS
+    read -p "Enter Security Group IDs (default: sg-06397b33fd9e23761): " SECURITY_GROUP_IDS
+    SECURITY_GROUP_IDS=${SECURITY_GROUP_IDS:-sg-06397b33fd9e23761}
 
     echo
 
@@ -170,3 +183,4 @@ main() {
 
 
 main
+
